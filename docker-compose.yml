@@ -1,0 +1,34 @@
+version: "3.9"
+   
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+    volumes:
+          - data-volume:/var/lib/postgresql/data
+  web:
+    build: .
+    environment:
+      - COLLECT_STATIC=${REBUILD_FRONT}
+    command: ./initserver.sh
+    volumes:
+      - .:/code
+    ports:
+      # - "8000:8000"
+      - "8008:8008"
+    depends_on:
+      - db
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8010:8010"
+    volumes:
+      - ./nginx/config:/etc/nginx/conf.d
+    depends_on:
+      - web
+volumes:
+   data-volume: 
